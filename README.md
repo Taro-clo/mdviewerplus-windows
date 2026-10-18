@@ -3,6 +3,8 @@
 An offline Markdown viewer and editor for Windows 10/11, built with Tauri 2,
 CodeMirror 6, and one shared Lite/Full source tree.
 
+English | [简体中文](README.zh-CN.md)
+
 ## Editions
 
 **Full is the recommended download.** Lite is for users who want the smallest
