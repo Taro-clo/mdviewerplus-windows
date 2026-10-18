@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Fixed the window not closing from the title bar or **File > Quit**. Tauri
+  defers the native close to the webview's close-requested listener, so an
+  approved close finishes through `window.destroy()`, which needs
+  `core:window:allow-destroy`; that permission was missing and the call failed
+  silently after the window had already been opened for JS.
+
 ## 2.2.0
 
 - Added drag and drop: dropping a Markdown file opens it, dropping a folder

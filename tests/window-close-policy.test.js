@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import { closeAfterApproval } from '../src/js/window-close-policy.js';
@@ -32,4 +33,24 @@ test('successful approved close retains the deliberate close-event bypass', asyn
   );
 
   assert.equal(approved, true);
+});
+
+test('window close grants the JS destroy that Tauri delegates the native close to', async () => {
+  const [capabilitiesText, mainSource] = await Promise.all([
+    readFile(new URL('../src-tauri/capabilities/default.json', import.meta.url), 'utf8'),
+    readFile(new URL('../src/js/main.js', import.meta.url), 'utf8'),
+  ]);
+  const capabilities = JSON.parse(capabilitiesText);
+
+  // Tauri prevents the native close as soon as a JS close-requested listener is
+  // registered and leaves the actual teardown to the webview, so the approved
+  // close finishes through `window.destroy()` inside @tauri-apps/api. When that
+  // command is not granted the request is rejected silently and the window can
+  // never be closed from the title bar or File > Quit.
+  assert.match(mainSource, /getCurrentWindow\(\)\.onCloseRequested\(/);
+  assert.match(mainSource, /event\.preventDefault\(\)/);
+  assert.ok(
+    capabilities.permissions.includes('core:window:allow-destroy'),
+    'core:window:allow-destroy is required by onCloseRequested',
+  );
 });

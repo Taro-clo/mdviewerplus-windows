@@ -38,6 +38,14 @@ watcher events carry a generation and cannot refresh a later folder snapshot.
 Watchers are non-recursive, debounced, and explicitly stopped during document
 changes and approved window close.
 
+## Window lifecycle
+
+The webview answers the window close request so an unsaved document can be
+confirmed first. Because Tauri defers the native close to that listener, the
+approved close finishes by destroying the window from the webview, which is why
+the main window grants `core:window:allow-close` and
+`core:window:allow-destroy`. The app never targets another window.
+
 ## CSP
 
 Scripts are self-only. Remote connections, frames, objects, workers, media,
